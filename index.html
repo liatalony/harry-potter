@@ -9,8 +9,32 @@
     <title>Student List</title>
   </head>
   <body>
-    <header><h1>Hogwarts Students of 1991</h1></header>
+    <header>
+      <h1>Hogwarts</h1>
+      <h3>Class of 91</h3>
+    </header>
     <main>
+      <div class="adjust">
+        <div class="filterCon">
+          <label for="filter">Filter by:</label>
+          <select name="filter" data-field="filter" data-filter="All">
+            <option selected="true">All</option>
+            <option>Gryffindor</option>
+            <option>Slytherin</option>
+            <option>Hufflepuff</option>
+            <option>Ravenclaw</option>
+          </select>
+        </div>
+        <div class="sortCon">
+          <label for="sort">Sort by:</label>
+          <select name="sort" data-field="sort">
+            <option data-field="firstName">First Name</option>
+            <option data-field="lastName">Last Name</option>
+            <option data-field="house">House</option>
+          </select>
+        </div>
+      </div>
+
       <ul></ul>
     </main>
     <div class="BG hide">
@@ -19,10 +43,22 @@
           <img class="crest" src="images/Gryffindor.png" alt="crest" />
           <div class="textContainer">
             <h2>name</h2>
-            <h3>house</h3>
+            <h4>house</h4>
           </div>
+          <p class="Modalclose">X</p>
         </div>
-        <img class="img" src="images/img.jpg" alt="Student Photo" />
+        <img class="img profile" src="" alt="Student Photo" />
+        <p class="blood">Blood Status: <span class="purity">type</span></p>
+        <button type="button" class="makeRevoke"></button>
+        <button type="button">Add to Inquisitorial Club</button>
+      </div>
+    </div>
+    <div class="prefectBG hide">
+      <div class="prefectAlert">
+        <p class="Prefectclose">X</p>
+        <h1>There can only be two prefects to each house</h1>
+        <p><button data-action="remove1">Revoke</button> <span class="prefect1">NAME, the TYPE</span></p>
+        <p><button data-action="remove2">Revoke</button> <span class="prefect2">NAME, the TYPE</span></p>
       </div>
     </div>
     <template>
