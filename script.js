@@ -3,19 +3,15 @@
 window.addEventListener("DOMContentLoaded", init);
 
 function init() {
-  const bg = document.querySelector(".BG");
-  const modal = document.querySelector(".modal");
-  document.querySelector(".Modalclose").addEventListener("click", function() {
-    bg.classList.add("hide");
-    modal.classList.remove(whatHouse);
-  });
-
   const prefectClose = document.querySelector(".Prefectclose");
   const prefectBG = document.querySelector(".prefectBG");
   prefectClose.addEventListener("click", function() {
     prefectBG.classList.add("hide");
   });
 
+  fetch("http://petlatkea.dk/2020/hogwarts/families.json")
+    .then(res => res.json())
+    .then(bloodSplit);
   fetch("https://petlatkea.dk/2020/hogwarts/students.json")
     .then(res => res.json())
     .then(split);
@@ -23,11 +19,16 @@ function init() {
 /* **************GLOBAL VARIABLES*************** */
 let filterValue;
 let sortValue;
+let searchValue;
+let whatHouse;
 const newArray = [];
+let bloodArray = [];
+let expelledArray = [];
 let currentArray;
 
 document.querySelector("[data-field=filter]").addEventListener("change", halfStart);
 document.querySelector("[data-field=sort]").addEventListener("change", halfStart);
+document.querySelector(".search").addEventListener("keyup", halfStart);
 
 const OneStudent = {
   firstName: "",
@@ -41,7 +42,6 @@ const OneStudent = {
   img: ""
 };
 /* ******************************************** */
-
 /* ******************FILTER******************** */
 function getFilter() {
   //console.log("hello");
@@ -49,11 +49,16 @@ function getFilter() {
   //console.log(filterValue);
   if (filterValue === "All") {
     currentArray = currentArray.filter(filterAll);
-    getSort(currentArray);
+  } else if (filterValue === "Prefects") {
+    currentArray = currentArray.filter(filterPrefects);
+  } else if (filterValue === "Expelled") {
+    currentArray = expelledArray;
+  } else if (filterValue === "Inquisitorial") {
+    currentArray = currentArray.filter(isInqios);
   } else {
     currentArray = currentArray.filter(isFilter);
-    getSort(currentArray);
   }
+  getSort(currentArray);
 
   function isFilter(student) {
     if (filterValue != "expelled") {
@@ -64,25 +69,30 @@ function getFilter() {
   function filterAll(student) {
     return true;
   }
+
+  function filterPrefects(student) {
+    return student.prefect === true;
+  }
+  function isInqios(student) {
+    return student.inquisuitorial === true;
+  }
 }
 /* ******************************************** */
-
 /* ********************SORT******************** */
 function getSort() {
   //console.log("hola");
   sortValue = document.querySelector("[data-field=sort]").value;
   if (sortValue === "First Name") {
     currentArray.sort(first);
-    displayList(currentArray);
   } else if (sortValue === "Last Name") {
     currentArray.sort(last);
-    displayList(currentArray);
   } else if (sortValue === "House") {
     currentArray.sort(sortHouse);
-    displayList(currentArray);
+  } else if (sortValue === "Blood") {
+    currentArray.sort(sortBlood);
   }
+  getSearch(currentArray);
 }
-
 function first(a, b) {
   if (a.firstName < b.firstName) {
     return -1;
@@ -101,7 +111,6 @@ function last(a, b) {
   }
   return 0;
 }
-
 function sortHouse(a, b) {
   if (a.house < b.house) {
     return -1;
@@ -110,7 +119,29 @@ function sortHouse(a, b) {
   }
   return 0;
 }
+function sortBlood(a, b) {
+  if (a.blood < b.blood) {
+    return -1;
+  } else if (a.blood > b.blood) {
+    return 1;
+  }
+  return 0;
+}
 /* ******************************************** */
+/* ********************SEARCH******************** */
+function getSearch() {
+  const input = document.querySelector(".search");
+  searchValue = input.value;
+  currentArray = currentArray.filter(searching);
+  displayList(currentArray);
+}
+
+function searching(student) {
+  const fullname = [student.firstName, student.middleName, student.nickName, student.lastName].join(" ");
+  if (fullname.toLowerCase().indexOf(searchValue) > -1) {
+    return true;
+  }
+}
 
 function displayList(student) {
   document.querySelector("ul").innerHTML = "";
@@ -121,6 +152,10 @@ function split(list) {
   //console.log(list);
   list.forEach(makeNewArray);
   halfStart();
+}
+function bloodSplit(bloods) {
+  bloodArray = bloods;
+  console.log(bloodArray);
 }
 
 function halfStart() {
@@ -172,28 +207,38 @@ function makeNewArray(badStudent) {
   oneStudent.inquisuitorial = false;
   oneStudent.expelled = false;
 
+  //-------------BLOOD -----------------//
+
+  const pureArray = bloodArray.pure.filter(blood => oneStudent.lastName === blood);
+  if (pureArray.length > 0) {
+    const pureAndHalf = bloodArray.half.filter(blood => oneStudent.lastName === blood);
+    if (pureAndHalf.length > 0) {
+      oneStudent.blood = "Half-blood";
+    } else {
+      oneStudent.blood = "Pure-blood";
+    }
+  } else {
+    const halfArray = bloodArray.half.filter(blood => oneStudent.lastName === blood);
+    if (halfArray.length > 0) {
+      oneStudent.blood = "Half-blood";
+    } else {
+      oneStudent.blood = "Muggle-born";
+    }
+  }
+
   newArray.push(oneStudent);
 }
 /* ************************************************************ */
 
-let whatHouse;
 function create(name) {
-  //console.log(name);
-
   const template = document.querySelector("template").content;
   const templateCopy = template.cloneNode(true);
   const studentName = templateCopy.querySelector(".name");
 
   studentName.textContent = [name.firstName, name.middleName, name.nickName, name.lastName].join(" ");
+
+  /* ************************* MODAL *************************** */
   studentName.addEventListener("click", function() {
-    /* ************************* MODAL *************************** */
-
-    if (name.prefect) {
-      document.querySelector(".makeRevoke").textContent = "Revoke Prefect";
-    } else {
-      document.querySelector(".makeRevoke").textContent = "Make Prefect";
-    }
-
     const bg = document.querySelector(".BG");
     bg.classList.remove("hide");
     const modalName = document.querySelector("h2");
@@ -201,12 +246,46 @@ function create(name) {
     const modal = document.querySelector(".modal");
     const crest = document.querySelector(".crest");
     const picture = document.querySelector(".profile");
+    const bloodType = document.querySelector(".blood span");
+    const club = document.querySelector(".inquisitorial");
+    const expel = document.querySelector(".expel");
     const makeRevoke = document.querySelector(".makeRevoke");
     let imgPath;
+
+    if (name.prefect) {
+      document.querySelector(".makeRevoke").textContent = "Revoke Prefect";
+    } else {
+      document.querySelector(".makeRevoke").textContent = "Make Prefect";
+    }
+    if (name.expelled) {
+      expel.textContent = "Expelled";
+      expel.disabled = true;
+      makeRevoke.classList.add("hide");
+      club.classList.add("hide");
+      modal.classList.add("Expelled");
+    } else {
+      expel.textContent = "Expel";
+      expel.disabled = false;
+      makeRevoke.classList.remove("hide");
+      club.classList.remove("hide");
+    }
+
     const checkName = newArray.filter(imgName);
     modalName.textContent = studentName.textContent;
     house.textContent = name.house;
     crest.setAttribute("src", `images/${name.house}.png`);
+    bloodType.textContent = name.blood;
+    if (name.blood === "Pure-blood" || name.house === "Slytherin") {
+      club.classList.remove("hide");
+      if (name.inquisuitorial) {
+        club.textContent = "Remove from inquisitorial club";
+      } else {
+        club.textContent = "Add to inquisitorial club";
+      }
+    } else {
+      club.classList.add("hide");
+    }
+
     if (checkName.length > 1) {
       imgPath = `${name.lastName.toLowerCase()}_${name.firstName.toLowerCase()}`;
     } else {
@@ -218,42 +297,87 @@ function create(name) {
     }
 
     picture.setAttribute("src", `images/images/${imgPath}.png`);
-    //console.log(`images/images/${imgPath}.png`);
     whatHouse = name.house;
     modal.classList.add(whatHouse);
 
     makeRevoke.addEventListener("click", ThePrefect);
+    club.addEventListener("click", inquis);
+    expel.addEventListener("click", expelling);
+    document.querySelector(".Modalclose").addEventListener("click", function() {
+      document.querySelector(".BG").classList.add("hide");
+      document.querySelector(".modal").classList.remove(whatHouse);
+      // Had to google that one. without this the eventListener is active for all students.
+      // Each time i click on a student the event is activated on every previously clicked student.
+      // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/removeEventListener
+      makeRevoke.removeEventListener("click", ThePrefect);
+      club.removeEventListener("click", inquis);
+      expel.removeEventListener("click", expelling);
+      modal.classList.remove(`Expelled`);
+    });
 
     function ThePrefect() {
       if (name.prefect) {
         console.log("prefect is now revoked");
         name.prefect = false;
-        document.querySelector(".BG").classList.add("hide");
-        document.querySelector(".modal").classList.remove(whatHouse);
-
-        // Had to google that one. without this the eventListener is active for all students.
-        // Each time i click on a student the event is activated on every previously clicked student.
-        // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/removeEventListener
-        makeRevoke.removeEventListener("click", ThePrefect);
+        document.querySelector(".makeRevoke").textContent = "Make Prefect";
         halfStart();
       } else {
-        console.log("prefect is ");
         const checkPRE = newArray.filter(student => student.prefect);
         const checkHouse = checkPRE.filter(prefect => prefect.house == name.house);
-        console.log(checkHouse);
         if (checkHouse.length < 2) {
+          console.log(`${name.firstName} is now a prefect`);
           name.prefect = true;
-          document.querySelector(".BG").classList.add("hide");
-          document.querySelector(".modal").classList.remove(whatHouse);
-          makeRevoke.removeEventListener("click", ThePrefect);
+          document.querySelector(".makeRevoke").textContent = "Revoke Prefect";
           halfStart();
+          console.log(checkHouse);
         } else {
           document.querySelector(".prefectBG").classList.remove("hide");
+          document.querySelector(".prefect1").textContent = [checkHouse[0].firstName, checkHouse[0].middleName, checkHouse[0].nickName, checkHouse[0].lastName].join(" ");
+          document.querySelector(".prefect2").textContent = [checkHouse[1].firstName, checkHouse[1].middleName, checkHouse[1].nickName, checkHouse[1].lastName].join(" ");
+          document.querySelector(".remove1").addEventListener("click", function() {
+            checkHouse[0].prefect = false;
+            name.prefect = true;
+            document.querySelector(".makeRevoke").textContent = "Revoke Prefect";
+            document.querySelector(".prefectBG").classList.add("hide");
+          });
+          document.querySelector(".remove2").addEventListener("click", function() {
+            checkHouse[1].prefect = false;
+            name.prefect = true;
+            document.querySelector(".prefectBG").classList.add("hide");
+            document.querySelector(".makeRevoke").textContent = "Revoke Prefect";
+          });
         }
-        console.log(name.firstName + " " + name.prefect);
+        // console.log(name.firstName + " " + name.prefect);
       }
     }
-  });
 
+    function inquis() {
+      if (name.inquisuitorial) {
+        name.inquisuitorial = false;
+        club.textContent = "Add to inquisitorial club";
+      } else {
+        name.inquisuitorial = true;
+        club.textContent = "Remove from inquisitorial club";
+      }
+      console.log(`${name.firstName} is ${name.inquisuitorial}`);
+
+      halfStart();
+    }
+
+    function expelling() {
+      name.expelled = true;
+      const index = newArray.indexOf(name);
+      newArray.splice(index, 1);
+      expelledArray.push(name);
+      modal.classList.add(`Expelled`);
+      name.prefect = false;
+      makeRevoke.classList.add("hide");
+      name.inquisuitorial = false;
+      club.classList.add("hide");
+      expel.textContent = "Expelled";
+      expel.disabled = true;
+      halfStart();
+    }
+  });
   document.querySelector("ul").appendChild(templateCopy);
 }

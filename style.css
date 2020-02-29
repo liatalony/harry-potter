@@ -52,6 +52,12 @@ select {
   padding-bottom: 0.9em;
 }
 
+input {
+  padding: 0.3em;
+  border-radius: 25px;
+  display: block;
+  margin: auto;
+}
 html {
   padding: 0;
   margin: 0;
@@ -61,7 +67,7 @@ html {
   color: var(--border-text-color);
   margin: auto;
   width: 100%;
-  height: 100%;
+  height: max-content;
   border-radius: 10px;
   padding: 10px;
   box-shadow: 5px 3px 15px 10px black;
@@ -182,6 +188,7 @@ header {
   padding-left: 0;
   padding-right: 0;
   text-align: center;
+  margin-bottom: 0.9em;
 }
 
 .Slytherin {
@@ -202,6 +209,11 @@ header {
 .Hufflepuff {
   --primary-color: #cc9900;
   --border-text-color: black;
+}
+
+.Expelled {
+  --primary-color: #26282a;
+  --border-text-color: #8f9194;
 }
 
 .prefectBG {
@@ -229,7 +241,17 @@ header {
   background-color: var(--alert-color);
 }
 
+.prefectAlert button {
+  display: inline;
+}
 .Prefectclose {
   text-align: right;
   margin-top: 0;
+}
+
+@media all and (min-width: 500px) {
+  .modal {
+    margin-top: 7%;
+    width: max-content;
+  }
 }
