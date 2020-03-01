@@ -282,21 +282,6 @@ function create(name) {
       document.querySelector(".makeRevoke").textContent = "Make Prefect";
     }
 
-    if (name.expelled) {
-      expel.textContent = "Expelled";
-      expel.disabled = true;
-      makeRevoke.classList.add("hide");
-      club.classList.add("hide");
-      modal.classList.add("Expelled");
-    } else {
-      expel.textContent = "Expel";
-      expel.disabled = false;
-      if (name.blood === "Pure-blood" || name.house === "Slytherin") {
-        club.classList.remove("hide");
-      }
-      makeRevoke.classList.remove("hide");
-    }
-
     const checkName = newArray.filter(imgName);
     modalName.textContent = studentName.textContent;
     house.textContent = name.house;
@@ -324,6 +309,21 @@ function create(name) {
       }
     } else {
       club.classList.add("hide");
+    }
+
+    if (name.expelled) {
+      expel.textContent = "Expelled";
+      expel.disabled = true;
+      makeRevoke.classList.add("hide");
+      club.classList.add("hide");
+      modal.classList.add("Expelled");
+    } else {
+      expel.textContent = "Expel";
+      expel.disabled = false;
+      if (name.blood === "Pure-blood" || name.house === "Slytherin") {
+        club.classList.remove("hide");
+      }
+      makeRevoke.classList.remove("hide");
     }
     if (checkName.length > 1) {
       imgPath = `${name.lastName.toLowerCase()}_${name.firstName.toLowerCase()}`;
