@@ -47,7 +47,7 @@ select {
 .adjust {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  box-shadow: 1px 1px 3px black;
+  box-shadow: 1px 2px 3px black;
   max-width: 100%;
   padding-bottom: 0.9em;
 }
@@ -90,6 +90,8 @@ h3 {
   margin: 0;
   color: var(--primary-color);
   font-weight: 100;
+  display: inline;
+  white-space: pre;
 }
 h2 {
   margin: 0;
@@ -216,7 +218,10 @@ header {
   --border-text-color: #8f9194;
 }
 
-.prefectBG {
+.prefectBG,
+.expelBG,
+.hackBG,
+.cantBG {
   background-color: rgba(0, 0, 0, 0.8);
   position: fixed;
   top: 0;
@@ -226,12 +231,18 @@ header {
   padding: 0.7em;
 }
 
-.prefectAlert h1 {
+.prefectAlert h1,
+.expelAlert h1,
+.hackAlert h1,
+.cantAlert h1 {
   font-size: 3rem;
   color: black;
 }
 
-.prefectAlert {
+.prefectAlert,
+.expelAlert,
+.hackAlert,
+.cantAlert {
   display: block;
   margin: auto;
   width: max-content;
@@ -241,14 +252,53 @@ header {
   background-color: var(--alert-color);
 }
 
-.prefectAlert button {
+.alarm {
+  animation: colors 2s infinite;
+}
+
+@keyframes colors {
+  0% {
+    background-color: rgba(255, 0, 0, 0.8);
+  }
+  50% {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+  100% {
+    background-color: rgba(255, 0, 0, 0.8);
+  }
+}
+.test {
+  position: sticky;
+  top: 0;
+  background-color: #181b1d;
+  padding-top: 0.9em;
+}
+.prefectAlert button,
+.expelAlert button {
   display: inline;
 }
-.Prefectclose {
+.Prefectclose,
+.Alertclose,
+.cantclose {
   text-align: right;
   margin-top: 0;
 }
 
+.removing {
+  animation: remove 1s forwards;
+}
+
+@keyframes remove {
+  0% {
+    transform: translateX(0);
+  }
+  10% {
+    transform: translateX(10px);
+  }
+  100% {
+    transform: translateX(-300px);
+  }
+}
 @media all and (min-width: 500px) {
   .modal {
     margin-top: 7%;

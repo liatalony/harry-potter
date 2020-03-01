@@ -14,29 +14,31 @@
       <h3>Class of 91</h3>
     </header>
     <main>
-      <input type="search" placeholder="Search student" name="search" class="search" />
-      <div class="adjust">
-        <div class="filterCon">
-          <label for="filter">Filter by:</label>
-          <select name="filter" data-field="filter" data-filter="All">
-            <option selected="true">All</option>
-            <option>Gryffindor</option>
-            <option>Slytherin</option>
-            <option>Hufflepuff</option>
-            <option>Ravenclaw</option>
-            <option>Expelled</option>
-            <option>Prefects</option>
-            <option>Inquisitorial</option>
-          </select>
-        </div>
-        <div class="sortCon">
-          <label for="sort">Sort by:</label>
-          <select name="sort" data-field="sort">
-            <option data-field="firstName">First Name</option>
-            <option data-field="lastName">Last Name</option>
-            <option data-field="house">House</option>
-            <option data-field="blood">Blood</option>
-          </select>
+      <div class="test">
+        <input type="search" placeholder="Search student" name="search" class="search" />
+        <div class="adjust">
+          <div class="filterCon">
+            <label for="filter">Filter by:</label>
+            <select name="filter" data-field="filter" data-filter="All">
+              <option selected="true">All</option>
+              <option>Gryffindor</option>
+              <option>Slytherin</option>
+              <option>Hufflepuff</option>
+              <option>Ravenclaw</option>
+              <option>Expelled</option>
+              <option>Prefects</option>
+              <option>Inquisitorial</option>
+            </select>
+          </div>
+          <div class="sortCon">
+            <label for="sort">Sort by:</label>
+            <select name="sort" data-field="sort">
+              <option data-field="firstName">First Name</option>
+              <option data-field="lastName">Last Name</option>
+              <option data-field="house">House</option>
+              <option data-field="blood">Blood</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -65,6 +67,26 @@
         <h1>There can only be two prefects to each house</h1>
         <p><button class="remove1">Revoke</button> <span class="prefect1">NAME, the TYPE</span></p>
         <p><button class="remove2">Revoke</button> <span class="prefect2">NAME, the TYPE</span></p>
+      </div>
+    </div>
+    <div class="hackBG alarm hide">
+      <div class="hackAlert">
+        <p class="Alertclose">X</p>
+        <h1>Warning!<br />You have been hacked!</h1>
+      </div>
+    </div>
+
+    <div class="cantBG hide">
+      <div class="cantAlert">
+        <p class="cantclose">X</p>
+        <h1>This student can't be expelled</h1>
+      </div>
+    </div>
+    <div class="expelBG hide">
+      <div class="expelAlert">
+        <h1>Are you sure you want to expel this student?</h1>
+        <button class="cancel">Cancel</button>
+        <button class="confirm">Expel</button>
       </div>
     </div>
     <template>

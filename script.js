@@ -9,6 +9,15 @@ function init() {
     prefectBG.classList.add("hide");
   });
 
+  document.querySelector("h3").addEventListener("click", function() {
+    hacked = true;
+    newArray.push(me);
+    document.querySelector(".hackBG").classList.remove("hide");
+    document.querySelector(".Alertclose").addEventListener("click", function() {
+      document.querySelector(".hackBG").classList.add("hide");
+    });
+    halfStart();
+  });
   fetch("http://petlatkea.dk/2020/hogwarts/families.json")
     .then(res => res.json())
     .then(bloodSplit);
@@ -25,6 +34,7 @@ const newArray = [];
 let bloodArray = [];
 let expelledArray = [];
 let currentArray;
+let hacked = false;
 
 document.querySelector("[data-field=filter]").addEventListener("change", halfStart);
 document.querySelector("[data-field=sort]").addEventListener("change", halfStart);
@@ -36,10 +46,24 @@ const OneStudent = {
   lastName: undefined,
   nickName: undefined,
   house: "",
+  blood: "",
   expelled: false,
   prefect: false,
   inquisuitorial: false,
-  img: ""
+  img: "none"
+};
+
+const me = {
+  firstName: "Liat",
+  middleName: undefined,
+  lastName: "Alony",
+  nickName: undefined,
+  house: "Hufflepuff",
+  blood: "Muggle-born",
+  expelled: false,
+  prefect: false,
+  inquisuitorial: false,
+  img: "alony_l"
 };
 /* ******************************************** */
 /* ******************FILTER******************** */
@@ -257,6 +281,7 @@ function create(name) {
     } else {
       document.querySelector(".makeRevoke").textContent = "Make Prefect";
     }
+
     if (name.expelled) {
       expel.textContent = "Expelled";
       expel.disabled = true;
@@ -266,16 +291,31 @@ function create(name) {
     } else {
       expel.textContent = "Expel";
       expel.disabled = false;
+      if (name.blood === "Pure-blood" || name.house === "Slytherin") {
+        club.classList.remove("hide");
+      }
       makeRevoke.classList.remove("hide");
-      club.classList.remove("hide");
     }
 
     const checkName = newArray.filter(imgName);
     modalName.textContent = studentName.textContent;
     house.textContent = name.house;
     crest.setAttribute("src", `images/${name.house}.png`);
-    bloodType.textContent = name.blood;
-    if (name.blood === "Pure-blood" || name.house === "Slytherin") {
+    if (hacked === true) {
+      if (name.blood === "Pure-blood") {
+        const bloods = ["pure-blood", "Half-blood", "Muggle-born"];
+        const rnd = Math.floor(Math.random() * 3);
+        console.log(rnd);
+
+        bloodType.textContent = bloods[rnd];
+      } else {
+        bloodType.textContent = "Pure-blood";
+      }
+    } else {
+      bloodType.textContent = name.blood;
+    }
+
+    if (bloodType.textContent === "Pure-blood" || name.house === "Slytherin") {
       club.classList.remove("hide");
       if (name.inquisuitorial) {
         club.textContent = "Remove from inquisitorial club";
@@ -285,7 +325,6 @@ function create(name) {
     } else {
       club.classList.add("hide");
     }
-
     if (checkName.length > 1) {
       imgPath = `${name.lastName.toLowerCase()}_${name.firstName.toLowerCase()}`;
     } else {
@@ -297,12 +336,16 @@ function create(name) {
     }
 
     picture.setAttribute("src", `images/images/${imgPath}.png`);
+    console.log(`images/images/${imgPath}.png`);
+
     whatHouse = name.house;
     modal.classList.add(whatHouse);
 
     makeRevoke.addEventListener("click", ThePrefect);
     club.addEventListener("click", inquis);
-    expel.addEventListener("click", expelling);
+    expel.addEventListener("click", expelAlert);
+    document.querySelector(".confirm").addEventListener("click", expelling);
+    document.querySelector(".cancel").addEventListener("click", cancelling);
     document.querySelector(".Modalclose").addEventListener("click", function() {
       document.querySelector(".BG").classList.add("hide");
       document.querySelector(".modal").classList.remove(whatHouse);
@@ -311,10 +354,29 @@ function create(name) {
       // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/removeEventListener
       makeRevoke.removeEventListener("click", ThePrefect);
       club.removeEventListener("click", inquis);
-      expel.removeEventListener("click", expelling);
+      expel.removeEventListener("click", expelAlert);
+      document.querySelector(".confirm").removeEventListener("click", expelling);
+      document.querySelector(".cancel").removeEventListener("click", cancelling);
       modal.classList.remove(`Expelled`);
     });
 
+    function expelAlert() {
+      if (name.firstName === "Liat") {
+        document.querySelector(".cantBG").classList.remove("hide");
+        document.querySelector(".cantclose").addEventListener("click", function() {
+          document.querySelector(".cantBG").classList.add("hide");
+        });
+      } else {
+        document.querySelector(".confirm").addEventListener("click", expelling);
+        document.querySelector(".cancel").addEventListener("click", cancelling);
+        document.querySelector(".expelBG").classList.remove("hide");
+      }
+    }
+    function cancelling() {
+      document.querySelector(".expelBG").classList.add("hide");
+      document.querySelector(".confirm").removeEventListener("click", expelling);
+      document.querySelector(".cancel").removeEventListener("click", cancelling);
+    }
     function ThePrefect() {
       if (name.prefect) {
         console.log("prefect is now revoked");
@@ -350,7 +412,6 @@ function create(name) {
         // console.log(name.firstName + " " + name.prefect);
       }
     }
-
     function inquis() {
       if (name.inquisuitorial) {
         name.inquisuitorial = false;
@@ -358,25 +419,34 @@ function create(name) {
       } else {
         name.inquisuitorial = true;
         club.textContent = "Remove from inquisitorial club";
+        if (hacked === true) {
+          setTimeout(function() {
+            name.inquisuitorial = false;
+            club.textContent = "Add to inquisitorial club";
+          }, 1000);
+        }
       }
       console.log(`${name.firstName} is ${name.inquisuitorial}`);
 
       halfStart();
     }
-
     function expelling() {
       name.expelled = true;
       const index = newArray.indexOf(name);
       newArray.splice(index, 1);
       expelledArray.push(name);
-      modal.classList.add(`Expelled`);
       name.prefect = false;
-      makeRevoke.classList.add("hide");
       name.inquisuitorial = false;
-      club.classList.add("hide");
-      expel.textContent = "Expelled";
-      expel.disabled = true;
-      halfStart();
+      document.querySelector(".expelBG").classList.add("hide");
+
+      bg.classList.add("hide");
+      document.querySelector(".confirm").removeEventListener("click", expelling);
+      document.querySelector(".cancel").removeEventListener("click", cancelling);
+      expel.removeEventListener("click", expelAlert);
+      studentName.classList.add("removing");
+      setTimeout(function() {
+        halfStart();
+      }, 1000);
     }
   });
   document.querySelector("ul").appendChild(templateCopy);
